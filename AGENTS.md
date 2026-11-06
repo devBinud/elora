@@ -14,7 +14,8 @@ Use `bunx` instead of `npx` if the project uses bun (`bun.lock` present).
 
 ```bash
 npx expo install <package>  # ALWAYS use instead of npm/yarn/pnpm/bun add — resolves SDK-compatible versions
-npx expo start              # start the dev server
+npm start                   # dev server in Expo Go mode (expo start --go)
+npm run start:dev-client    # dev server for a development build
 npx expo lint               # lint
 npx tsc --noEmit            # typecheck
 npx expo-doctor             # diagnose dependency and config issues
@@ -25,7 +26,7 @@ Run lint and typecheck before declaring any task done.
 
 ## Navigation & Routing
 
-- Use **Expo Router** for all navigation. Routes live in `src/app/` — every file there is a screen, `_layout.tsx` files define navigators. Keep non-route code (components, hooks, utils) outside `src/app/`.
+- Use **Expo Router** for all navigation. Routes live in the root `app/` directory (do NOT create `src/app/`, it would take precedence and silently replace `app/`) — every file there is a screen, `_layout.tsx` files define navigators. Keep non-route code (components, hooks, utils) in `src/`. This project is pinned to **Expo SDK 54** (the user tests with Expo Go 54): use `Tabs` from `expo-router` and `ThemeProvider`/`DarkTheme` from `@react-navigation/native`. Do not upgrade the SDK unless asked.
 - Import `Link`, `router`, and `useLocalSearchParams` from `expo-router`.
 - Docs: https://docs.expo.dev/router/introduction.md
 

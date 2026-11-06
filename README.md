@@ -1,56 +1,42 @@
-# Welcome to your Expo app 👋
+# Elora
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A personal assistant app for daily routines, reminders, trusted news, a private journal and tasks.
+It is built with **Expo SDK 54 (React Native) + TypeScript**, and **Firebase** is the only backend.
 
-## Get started
+The full product specification is in [project-planning.md](project-planning.md).
 
-1. Install dependencies
+## Status
 
-   ```bash
-   npm install
-   ```
+| Phase | Scope | Status |
+| --- | --- | --- |
+| 1. Foundation | Expo, Router, Firebase, Auth, Firestore, SQLite, sync engine, navigation, UI kit | ✅ Done |
+| 2. Personal Assistant | Dashboard, reminders, local notifications, native alarm, routines | ⏳ Next |
+| 3. Admin Control Centre | Reminder/routine/news/category admin, settings | — |
+| 4. News Intelligence | RSS ingestion via Cloud Functions, feed, bookmarks, push | — |
+| 5. Personal Journal | Editor, autosave, offline writing, tags, search | — |
+| 6. Tasks & Productivity | Tasks, priorities, deadlines, reminders | — |
+| 7. Finalisation | Rule hardening, reliability testing, production build | — |
 
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Quick start
 
 ```bash
-npm run reset-project
+npm install
+cp .env.example .env        # fill in your Firebase web app config
+npm start                   # opens in Expo Go (SDK 54); press "a" for Android
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+Phase 1 runs in **Expo Go 54**. The native wake-up alarm (Phase 2) and FCM push (Phase 4) need code that Expo Go can't load, so those phases need a development build:
 
-### Other setup steps
+```bash
+npx eas-cli@latest build --profile development --platform android
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+Setup, scripts and troubleshooting are covered in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
+To configure the Firebase project, see [docs/FIREBASE.md](docs/FIREBASE.md).
 
-## Learn more
+## Documentation
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- [ARCHITECTURE.md](docs/ARCHITECTURE.md): folder layout, layers and the local-first sync design
+- [FIREBASE.md](docs/FIREBASE.md): Firebase project setup, rules, functions and admin users
+- [FIRESTORE_SCHEMA.md](docs/FIRESTORE_SCHEMA.md): collections, document shapes and security
+- [DEVELOPMENT.md](docs/DEVELOPMENT.md): running, building, checks and conventions

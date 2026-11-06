@@ -41,3 +41,16 @@ example
 # generated native folders
 /ios
 /android
+
+# Env & Firebase native config
+.env
+google-services.json
+GoogleService-Info.plist
+
+# Firebase
+firebase/functions/lib/
+firebase/functions/node_modules/
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log

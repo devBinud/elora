@@ -1,0 +1,96 @@
+rules_version = '2';
+
+// Elora Firestore Security Rules
+// See docs/FIRESTORE_SCHEMA.md for the data model.
+//
+// Principles:
+// - Every user's personal data lives under /users/{uid} and is visible only to them.
+// - Admin rights come from the existence of /adminUsers/{uid}, which clients
+//   can never write. Client-side admin flags are never trusted.
+// - News articles are written only by Cloud Functions (Admin SDK bypasses rules).
+// - Anything not matched below is denied.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Helpers ----------
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid));
+    }
+
+    // Collections synchronised by the app's local-first sync engine.
+    function syncedCollections() {
+      return ['reminders', 'routines', 'alarms', 'tasks', 'journals', 'bookmarks', 'notificationHistory'];
+    }
+
+    // Shape every synced document must have (see sync-engine.ts).
+    function isValidSyncedDoc(userId) {
+      let data = request.resource.data;
+      return data.userId == userId
+        && data.createdAt is number
+        && data.updatedAt is number
+        && data.deleted is bool
+        && data.serverUpdatedAt == request.time
+        && data.size() <= 60;
+    }
+
+    // ---------- Personal data ----------
+
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      match /{collection}/{docId} {
+        allow read: if isOwner(userId);
+        allow delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && (
+          (collection in syncedCollections() && isValidSyncedDoc(userId))
+          || collection in ['profile', 'devices']
+        );
+      }
+    }
+
+    // ---------- Admin-managed configuration ----------
+
+    match /newsCategories/{categoryId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /newsSources/{sourceId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /appConfig/{configId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ---------- Server-written content ----------
+
+    match /newsArticles/{articleId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Cloud Functions only.
+    }
+
+    // ---------- Admin registry ----------
+
+    match /adminUsers/{userId} {
+      // Users may check their own admin status. Nobody may list or write
+      // entries from a client; manage them in the Firebase console or via
+      // the Admin SDK.
+      allow get: if isOwner(userId);
+      allow list, write: if false;
+    }
+  }
+}
